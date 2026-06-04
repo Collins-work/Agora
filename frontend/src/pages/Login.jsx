@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useNavigate, NavLink } from 'react-router-dom'
 import { ArrowRight, Shield, UserCheck, KeyRound, Home, Mail } from 'lucide-react'
 import { Button, Input, Label, FormGroup } from '../components/ui'
-import { demo, findAccountByIdentifier, setActiveAccount } from '../data/auth'
+import { demo, findAccountByIdentifier, saveAccount, setActiveAccount } from '../data/auth'
 
 const Page = styled.div`
   min-height: 100vh;
@@ -181,8 +181,10 @@ export default function Login() {
   }
 
   const useDemo = () => {
+    saveAccount(demo)
     setIdentifier(demo.email)
     setPin(demo.pin)
+    setError('')
   }
 
   return (
