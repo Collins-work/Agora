@@ -1,11 +1,19 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, SectionTitle, Badge, Input } from '../components/ui'
 import { transactions, monthlyData } from '../data/mockData'
-import { ArrowDownLeft, ArrowUpRight, Search, Filter } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, Search, Filter, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 const TopRow = styled.div`display:grid;grid-template-columns:1fr 320px;gap:1.25rem;margin-bottom:1.25rem;`
 
 const FilterBar = styled.div`
@@ -59,6 +67,7 @@ const SumLbl = styled.p`font-size:12px;color:${p => p.theme.colors.earth[500]};m
 const fmt = n => '₦' + n.toLocaleString()
 
 export default function Transactions() {
+  const navigate = useNavigate()
   const theme = useTheme()
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
@@ -75,6 +84,7 @@ export default function Transactions() {
 
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Transactions</SectionTitle>
 
         <SummaryGrid>

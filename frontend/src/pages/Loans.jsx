@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
-import { Building2, CheckCircle, ArrowRight, TrendingUp, Clock } from 'lucide-react'
+import { Building2, CheckCircle, ArrowRight, TrendingUp, Clock, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 
 const HeroBanner = styled.div`
   background: linear-gradient(135deg, ${p => p.theme.colors.earth[700]} 0%, ${p => p.theme.colors.earth[800]} 100%);
@@ -76,6 +84,7 @@ const loans = [
 ]
 
 export default function Loans() {
+  const navigate = useNavigate()
   const theme = useTheme()
   const t = currentTrader
   const [applied, setApplied] = useState({})
@@ -88,6 +97,7 @@ export default function Loans() {
   }
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Loans</SectionTitle>
 
         <HeroBanner>

@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
-import { Shield, CheckCircle, ArrowRight, AlertTriangle, Package } from 'lucide-react'
+import { Shield, CheckCircle, ArrowRight, AlertTriangle, Package, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 
 const HeroBanner = styled.div`
   background:${p => p.theme.colors.earth[800]};
@@ -44,6 +52,7 @@ const plans = [
 ]
 
 export default function Insurance() {
+  const navigate = useNavigate()
   const theme = useTheme()
   const [insured, setInsured] = useState({})
 
@@ -55,6 +64,7 @@ export default function Insurance() {
   }
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Insurance</SectionTitle>
 
         <HeroBanner>

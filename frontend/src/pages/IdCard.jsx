@@ -2,12 +2,20 @@ import styled, { keyframes } from 'styled-components'
 import { useTheme } from 'styled-components'
 import { Button, Card, SectionTitle } from '../components/ui'
 import { currentTrader } from '../data/mockData'
-import { Download, Share2, Copy, CheckCircle } from 'lucide-react'
+import { Download, Share2, Copy, CheckCircle, ChevronLeft } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const float = keyframes`0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}`
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:900px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 
 const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;`
 
@@ -83,6 +91,7 @@ const ScoreTick = styled.p`font-size:10px;color:${p => p.theme.colors.earth[400]
 const t = currentTrader
 
 export default function IdCardPage() {
+  const navigate = useNavigate()
   const [copied, setCopied] = useState(false)
   const theme = useTheme()
 
@@ -94,6 +103,7 @@ export default function IdCardPage() {
 
   return (
     <Page>
+      <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
       <SectionTitle mb="1.5rem">My Business ID Card</SectionTitle>
 
       <Grid>

@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { opportunities, currentTrader } from '../data/mockData'
-import { TrendingUp, Shield, FileText, Building2, ArrowRight, Lock, CheckCircle, Clock } from 'lucide-react'
+import { TrendingUp, Shield, FileText, Building2, ArrowRight, Lock, CheckCircle, Clock, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 
 const ScoreBanner = styled.div`
   background:${p => p.theme.colors.earth[800]};
@@ -79,6 +87,7 @@ const ICONS = {
 }
 
 export default function Opportunities() {
+  const navigate = useNavigate()
   const theme = useTheme()
   const t = currentTrader
   const [applied, setApplied] = useState({})
@@ -91,6 +100,7 @@ export default function Opportunities() {
   }
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Opportunities</SectionTitle>
 
         <ScoreBanner>

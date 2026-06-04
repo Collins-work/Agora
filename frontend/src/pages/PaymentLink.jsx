@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Button, Card, SectionTitle, Input, Label, FormGroup } from '../components/ui'
 import { currentTrader, transactions } from '../data/mockData'
-import { Copy, CheckCircle, Share2, QrCode, ArrowDownLeft, ExternalLink, Zap } from 'lucide-react'
+import { Copy, CheckCircle, Share2, QrCode, ArrowDownLeft, ExternalLink, Zap, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;`
 
 const LinkCard = styled(Card)`
@@ -74,6 +82,7 @@ const inbound = transactions.filter(tx => tx.type === 'in' && tx.method === 'Kor
 const fmt = n => '₦' + n.toLocaleString()
 
 export default function PaymentLink() {
+  const navigate = useNavigate()
   const theme = useTheme()
   const [copied, setCopied] = useState(false)
   const [amount, setAmount] = useState('')
@@ -94,6 +103,7 @@ export default function PaymentLink() {
 
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Payment Link</SectionTitle>
         <Grid>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

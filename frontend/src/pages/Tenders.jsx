@@ -1,9 +1,17 @@
 import styled, { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
-import { FileText, Lock, ArrowRight, Building2, Clock, CheckCircle } from 'lucide-react'
+import { FileText, Lock, ArrowRight, Building2, Clock, CheckCircle, ChevronLeft } from 'lucide-react'
 
 const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const BackBtn = styled.button`
+  display:flex;align-items:center;gap:4px;
+  color:${p => p.theme.colors.earth[500]};
+  font-size:13px;margin-bottom:0.75rem;
+  transition:${p => p.theme.transition};
+  &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
+`
 
 const LockedBanner = styled.div`
   background:${p => p.theme.colors.earth[100]};
@@ -55,6 +63,7 @@ const tenders = [
 
 export default function Tenders() {
   const t = currentTrader
+  const navigate = useNavigate()
   const theme = useTheme()
   const needed = 800
   const pct = Math.min((t.creditScore / needed) * 100, 100)
@@ -62,6 +71,7 @@ export default function Tenders() {
 
   return (
     <Page>
+        <BackBtn onClick={() => navigate('/dashboard')}><ChevronLeft size={14} /> Back to dashboard</BackBtn>
         <SectionTitle mb="1.25rem">Government Tenders</SectionTitle>
 
         <LockedBanner>

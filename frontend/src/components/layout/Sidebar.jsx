@@ -50,6 +50,7 @@ const NavItem = styled(NavLink)`
   transition: ${p => p.theme.transition};
   margin-bottom: 2px;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover {
     background: rgba(255,255,255,0.08);
@@ -58,7 +59,7 @@ const NavItem = styled(NavLink)`
   &.active {
     background: ${p => p.theme.colors.gold[500]};
     color: ${p => p.theme.colors.earth[900]};
-    font-weight: 500;
+    font-weight: 600;
   }
   svg { width: 17px; height: 17px; flex-shrink: 0; }
 `
@@ -101,7 +102,7 @@ export default function Sidebar() {
   const navigate = useNavigate()
   return (
     <Wrap>
-      <Logo to="/">Ago<span>ra</span></Logo>
+      <Logo to="/dashboard">Ago<span>ra</span></Logo>
 
       <NavItem to="/dashboard"><LayoutDashboard /> Dashboard</NavItem>
       <NavItem to="/id-card"><CreditCard /> My ID Card</NavItem>
