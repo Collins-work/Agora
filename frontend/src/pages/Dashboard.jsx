@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, MetricCard, MetricLabel, MetricValue, MetricSub, SectionTitle, Badge, Avatar, fadeUp } from '../components/ui'
 import { currentTrader, scoreFactors, transactions, opportunities, monthlyData } from '../data/mockData'
-import { TrendingUp, ArrowDownLeft, ArrowUpRight, Bell, ChevronRight, Zap } from 'lucide-react'
+import { TrendingUp, ArrowDownLeft, ArrowUpRight, Bell, ChevronRight, Zap, Library, Shield, FileText, Building2 } from 'lucide-react'
 import styled2 from 'styled-components'
 
 const Page = styled.div`
@@ -129,6 +129,13 @@ const OppSub = styled.p`font-size:11px;color:${p => p.theme.colors.earth[400]};`
 
 const fmt = n => '₦' + n.toLocaleString()
 const CIRCUMFERENCE = 2 * Math.PI * 34
+
+const IC_MAP = {
+  loan: <Library />,
+  insurance: <Shield />,
+  grant: <FileText />,
+  tender: <Building2 />,
+}
 
 export default function Dashboard() {
   const navigate = useNavigate()
