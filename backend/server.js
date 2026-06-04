@@ -11,6 +11,7 @@ const { initDb, query } = require('./db')
 const app = express()
 const PORT = process.env.PORT || 4000
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
+const USE_MOCK_OTP = process.env.MOCK_OTP === 'true'
 
 app.use(cors({ origin: FRONTEND_URL }))
 app.use(express.json())
@@ -63,7 +64,9 @@ initDb().catch((err) => {
 
 // Email transporter (if SMTP config provided)
 let mailer = null
-if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+if (USE_MOCK_OTP) {
+  console.log('ℹ️ MOCK OTP enabled — email OTP will be mocked')
+} else if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   mailer = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT) || 587,
@@ -72,16 +75,18 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
   })
   console.log('✅ SMTP mailer configured')
 } else {
-  console.log('ℹ️ SMTP not configured — email OTP will be mocked (set SMTP_HOST/SMTP_USER/SMTP_PASS)')
+  console.log('ℹ️ SMTP not configured — email OTP will be mocked (set SMTP_HOST/SMTP_USER/SMTP_PASS or MOCK_OTP=true)')
 }
 
 // Twilio client (if configured)
 let twilioClient = null
-if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+if (USE_MOCK_OTP) {
+  console.log('ℹ️ MOCK OTP enabled — SMS OTP will be mocked')
+} else if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
   twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
   console.log('✅ Twilio configured for SMS')
 } else {
-  console.log('ℹ️ Twilio not configured — SMS OTP will be mocked (set TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN)')
+  console.log('ℹ️ Twilio not configured — SMS OTP will be mocked (set TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN or MOCK_OTP=true)')
 }
 
 // ── Health check ───────────────────────────────────────────────────────────
@@ -310,7 +315,7 @@ app.post('/api/send-otp', async (req, res) => {
 
   // Send email if requested and mailer configured
   if (method === 'email' && email) {
-    if (mailer) {
+    if (!USE_MOCK_OTP && mailer) {
       try {
         await mailer.sendMail({
           from: process.env.SMTP_FROM || 'no-reply@agora.local',
@@ -324,7 +329,9 @@ app.post('/api/send-otp', async (req, res) => {
         return res.json({ success: true, message: `OTP sent to ${email}` })
       } catch (err) {
         console.error('Failed to send email OTP', err.message)
-        return res.status(500).json({ success: false, message: 'Failed to send email OTP' })
+        if (!USE_MOCK_OTP) {
+          return res.status(500).json({ success: false, message: 'Failed to send email OTP' })
+        }
       }
     }
     // Fallback: mock send
@@ -334,7 +341,7 @@ app.post('/api/send-otp', async (req, res) => {
 
   // Send SMS if phone provided
   if (phone) {
-    if (twilioClient && process.env.TWILIO_FROM) {
+    if (!USE_MOCK_OTP && twilioClient && process.env.TWILIO_FROM) {
       try {
         await twilioClient.messages.create({
           body: `Your Agora verification code is ${otp}. It expires in 10 minutes. — Agora`,
@@ -344,7 +351,9 @@ app.post('/api/send-otp', async (req, res) => {
         return res.json({ success: true, message: `OTP sent to ${phone}` })
       } catch (err) {
         console.error('Failed to send SMS via Twilio', err.message)
-        return res.status(500).json({ success: false, message: 'Failed to send SMS OTP' })
+        if (!USE_MOCK_OTP) {
+          return res.status(500).json({ success: false, message: 'Failed to send SMS OTP' })
+        }
       }
     }
     // Fallback: mock send
