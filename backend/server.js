@@ -1,15 +1,18 @@
 const express = require('express')
 const cors = require('cors')
 const axios = require('axios')
+const bcrypt = require('bcryptjs')
 require('dotenv').config()
 
 const nodemailer = require('nodemailer')
 const twilio = require('twilio')
+const { initDb, query } = require('./db')
 
 const app = express()
 const PORT = process.env.PORT || 4000
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: FRONTEND_URL }))
 app.use(express.json())
 
 // ── KoraPay base config ────────────────────────────────────────────────────
@@ -26,6 +29,37 @@ const korapay = axios.create({
 
 // ── OTP store (in-memory demo) ─────────────────────────────────────────────
 const otpStore = new Map()
+
+const SALT_ROUNDS = 10
+
+const findUserByEmail = async (email) => {
+  const result = await query('SELECT id, email, phone, first_name, last_name FROM users WHERE email = $1', [email])
+  return result.rows[0]
+}
+
+const createUser = async ({ email, phone, firstName, lastName, password }) => {
+  const passwordHash = password ? await bcrypt.hash(password, SALT_ROUNDS) : null
+  const result = await query(
+    `INSERT INTO users (email, phone, first_name, last_name, password_hash)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, email, phone, first_name, last_name, created_at`,
+    [email, phone, firstName, lastName, passwordHash]
+  )
+  return result.rows[0]
+}
+
+const getOrCreateUser = async ({ email, phone, firstName, lastName }) => {
+  if (!email && !phone) return null
+  if (email) {
+    const existing = await findUserByEmail(email)
+    if (existing) return existing
+  }
+  return createUser({ email, phone, firstName, lastName })
+}
+
+initDb().catch((err) => {
+  console.error('❌ Postgres initialization failed:', err.message)
+})
 
 // Email transporter (if SMTP config provided)
 let mailer = null
@@ -53,6 +87,61 @@ if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
 // ── Health check ───────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'Agora API', timestamp: new Date() })
+})
+
+// ── User registration / login ──────────────────────────────────────────────
+app.post('/api/register', async (req, res) => {
+  const { email, password, firstName, lastName, phone } = req.body
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Email and password are required' })
+  }
+
+  try {
+    const existing = await findUserByEmail(email)
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'User already exists' })
+    }
+
+    const user = await createUser({ email, password, firstName, lastName, phone })
+    res.json({ success: true, user })
+  } catch (err) {
+    console.error('Register error:', err.message)
+    res.status(500).json({ success: false, message: 'Unable to register user' })
+  }
+})
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Email and password are required' })
+  }
+
+  try {
+    const user = await query('SELECT id, email, phone, first_name, last_name, password_hash FROM users WHERE email = $1', [email])
+    if (!user.rowCount) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' })
+    }
+
+    const dbUser = user.rows[0]
+    const valid = await bcrypt.compare(password, dbUser.password_hash || '')
+    if (!valid) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' })
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        phone: dbUser.phone,
+        firstName: dbUser.first_name,
+        lastName: dbUser.last_name,
+      },
+    })
+  } catch (err) {
+    console.error('Login error:', err.message)
+    res.status(500).json({ success: false, message: 'Unable to login' })
+  }
 })
 
 // ── BVN Verification (via KoraPay identity) ────────────────────────────────
@@ -93,6 +182,9 @@ app.post('/api/onboard', async (req, res) => {
   const slug = `${firstName}-${lastName}`.toLowerCase().replace(/[^a-z-]/g, '')
 
   try {
+    const user = await getOrCreateUser({ email, phone, firstName, lastName })
+    const bvnHash = bvn ? await bcrypt.hash(bvn, SALT_ROUNDS) : null
+
     // Create a KoraPay payment link for the trader
     const linkRes = await korapay.post('/transactions/initialize/link', {
       amount: null, // open amount — customer enters
@@ -104,20 +196,33 @@ app.post('/api/onboard', async (req, res) => {
     })
 
     const paymentLink = linkRes.data?.data?.link || `https://pay.korapay.com/agora/${slug}`
+
+    await query(
+      `INSERT INTO traders (user_id, business_id, first_name, last_name, phone, email, bvn_hash, market, trade_type, payment_link, credit_score)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [user?.id || null, businessId, firstName, lastName, phone, email, bvnHash, market, tradeType, paymentLink, 500]
+    )
+
     res.json({
       success: true,
       trader: { businessId, firstName, lastName, phone, email, market, tradeType, paymentLink, creditScore: 500 },
     })
   } catch (err) {
-    // Demo fallback
-    console.warn('KoraPay link creation failed, using mock:', err.message)
+    console.warn('Onboard failed, using mock fallback:', err.message)
+
+    const paymentLink = `https://pay.korapay.com/agora/${slug}`
     res.json({
       success: true,
       mock: true,
       trader: {
         businessId,
-        firstName, lastName, phone, email, market, tradeType,
-        paymentLink: `https://pay.korapay.com/agora/${slug}`,
+        firstName,
+        lastName,
+        phone,
+        email,
+        market,
+        tradeType,
+        paymentLink,
         creditScore: 500,
       },
     })
