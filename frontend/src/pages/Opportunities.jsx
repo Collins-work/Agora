@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
+import { useState } from 'react'
+import styled, { useTheme } from 'styled-components'
 import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { opportunities, currentTrader } from '../data/mockData'
 import { TrendingUp, Shield, FileText, Building2, ArrowRight, Lock, CheckCircle, Clock } from 'lucide-react'
@@ -78,12 +78,19 @@ const ICONS = {
   building: <Building2 />,
 }
 
-const t = currentTrader
-
 export default function Opportunities() {
+  const theme = useTheme()
+  const t = currentTrader
+  const [applied, setApplied] = useState({})
+
+  const handleApply = (id) => {
+    setApplied(prev => ({ ...prev, [id]: true }))
+    setTimeout(() => {
+      setApplied(prev => ({ ...prev, [id]: 'success' }))
+    }, 1500)
+  }
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Opportunities</SectionTitle>
 
         <ScoreBanner>
@@ -131,8 +138,15 @@ export default function Opportunities() {
               <OppDesc>{o.desc}</OppDesc>
               <OppFooter>
                 {o.status === 'ready' ? (
-                  <Button variant="gold" fullWidth>
-                    Apply now <ArrowRight size={14} />
+                  <Button 
+                    variant={applied[o.id] === 'success' ? 'outline' : 'gold'} 
+                    fullWidth 
+                    onClick={() => !applied[o.id] && handleApply(o.id)}
+                    disabled={applied[o.id] === true}
+                  >
+                    {applied[o.id] === 'success' ? <><CheckCircle size={14} /> Application sent</> 
+                      : applied[o.id] === true ? 'Sending...' 
+                      : <>{o.type === 'grant' ? 'Apply for grant' : o.type === 'loan' ? 'Start application' : 'Get access'} <ArrowRight size={14} /></>}
                   </Button>
                 ) : o.status === 'soon' ? (
                   <Button variant="outline" fullWidth disabled>
@@ -167,6 +181,5 @@ export default function Opportunities() {
           </div>
         </Card>
       </Page>
-    </AppLayout>
-  )
+    )
 }

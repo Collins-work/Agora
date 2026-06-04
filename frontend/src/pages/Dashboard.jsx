@@ -1,7 +1,6 @@
 import styled, { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import AppLayout from '../components/layout/AppLayout'
 import { Card, MetricCard, MetricLabel, MetricValue, MetricSub, SectionTitle, Badge, Avatar, fadeUp } from '../components/ui'
 import { currentTrader, scoreFactors, transactions, opportunities, monthlyData } from '../data/mockData'
 import { TrendingUp, ArrowDownLeft, ArrowUpRight, Bell, ChevronRight, Zap } from 'lucide-react'
@@ -138,9 +137,8 @@ export default function Dashboard() {
   const offset = CIRCUMFERENCE - (t.creditScore / t.maxScore) * CIRCUMFERENCE
 
   return (
-    <AppLayout>
-      <Page>
-        <TopBar>
+    <Page>
+      <TopBar>
           <div>
             <Greeting>Good morning, {t.name.split(' ')[0]} 👋</Greeting>
             <Sub>Friday, 30 May 2026 &nbsp;·&nbsp; {t.market}</Sub>
@@ -271,7 +269,7 @@ export default function Dashboard() {
             </div>
             {opportunities.map(o => (
               <OppCard key={o.id} onClick={() => navigate('/opportunities')}>
-                <OppIcon><TrendingUp /></OppIcon>
+                <OppIcon>{IC_MAP[o.type] || <TrendingUp />}</OppIcon>
                 <div style={{ flex: 1 }}>
                   <OppName>{o.title}</OppName>
                   <OppSub>{o.provider} · {o.sub}</OppSub>
@@ -284,6 +282,5 @@ export default function Dashboard() {
           </Card>
         </BottomGrid>
       </Page>
-    </AppLayout>
-  )
+    )
 }

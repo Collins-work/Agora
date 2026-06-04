@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import AppLayout from '../components/layout/AppLayout'
 import { Card, SectionTitle, Badge, Input } from '../components/ui'
 import { transactions, monthlyData } from '../data/mockData'
 import { ArrowDownLeft, ArrowUpRight, Search, Filter } from 'lucide-react'
@@ -75,8 +74,7 @@ export default function Transactions() {
   const viaKora = transactions.filter(t => t.method === 'KoraPay').length
 
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Transactions</SectionTitle>
 
         <SummaryGrid>
@@ -153,6 +151,5 @@ export default function Transactions() {
           </TxnTable>
         </Card>
       </Page>
-    </AppLayout>
-  )
+    )
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
 import { Card, SectionTitle, Button, Input, Label, FormGroup, Avatar, Divider } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { User, Shield, Bell, Link2, CheckCircle } from 'lucide-react'
@@ -55,8 +54,7 @@ export default function Settings() {
   const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000) }
 
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.5rem">Settings</SectionTitle>
         <Grid>
           <Card p="0.75rem">
@@ -156,6 +154,5 @@ export default function Settings() {
           </div>
         </Grid>
       </Page>
-    </AppLayout>
-  )
+    )
 }

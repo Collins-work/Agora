@@ -1,6 +1,5 @@
 import styled, { keyframes } from 'styled-components'
 import { useTheme } from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
 import { Button, Card, SectionTitle } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { Download, Share2, Copy, CheckCircle } from 'lucide-react'
@@ -94,97 +93,95 @@ export default function IdCardPage() {
   }
 
   return (
-    <AppLayout>
-      <Page>
-        <SectionTitle mb="1.5rem">My Business ID Card</SectionTitle>
+    <Page>
+      <SectionTitle mb="1.5rem">My Business ID Card</SectionTitle>
 
-        <Grid>
-          <div>
-            <BigCard>
-              <CardBrand>AGORA · BUSINESS IDENTITY</CardBrand>
-              <CardAvatar>{t.initials}</CardAvatar>
-              <CardName>{t.name}</CardName>
-              <CardTrade>{t.trade} · {t.market}, {t.state}</CardTrade>
-              <CardDivider />
-              <CardGrid>
-                <CardField><CFL>BUSINESS ID</CFL><CFV>{t.id}</CFV></CardField>
-                <CardField><CFL>MEMBER SINCE</CFL><CFV>{t.memberSince}</CFV></CardField>
-                <CardField><CFL>BVN LINKED</CFL><CFV>{t.bvn}</CFV></CardField>
-                <CardField><CFL>CREDIT SCORE</CFL><CFV gold>{t.creditScore} / {t.maxScore}</CFV></CardField>
-              </CardGrid>
-              <CardFooter>
-                <div>
-                  <p style={{ fontSize: '10px', color: theme.colors.earth[500], marginBottom: '4px' }}>Powered by</p>
-                  <p style={{ fontSize: '13px', fontWeight: '500', color: theme.colors.earth[800] }}>KoraPay</p>
-                </div>
-                <VerifiedPill><CheckCircle size={12} /> BVN Verified</VerifiedPill>
-                <QrBox>⊞</QrBox>
-              </CardFooter>
-            </BigCard>
-
-            <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
-              <Button variant="outline" style={{ flex: 1 }}>
-                <Share2 size={15} /> Share ID
-              </Button>
-              <Button variant="gold" style={{ flex: 1 }}>
-                <Download size={15} /> Download
-              </Button>
-            </div>
-          </div>
-
-          <RightPanel>
-            <Card delay="0.1s">
-              <SectionTitle>ID details</SectionTitle>
-              {[
-                ['Full name', t.name],
-                ['Business ID', t.id],
-                ['Trade type', t.trade],
-                ['Market', t.market],
-                ['State', t.state],
-                ['Phone', t.phone],
-                ['BVN status', '✓ Verified'],
-                ['Member since', t.memberSince],
-              ].map(([label, val]) => (
-                <InfoRow key={label}>
-                  <InfoLabel>{label}</InfoLabel>
-                  <InfoVal style={val.startsWith('✓') ? { color: theme.colors.earth[800] } : {}}>{val}</InfoVal>
-                </InfoRow>
-              ))}
-            </Card>
-
-            <Card delay="0.15s">
-              <SectionTitle>Credit score</SectionTitle>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: '36px', fontWeight: '700', color: theme.colors.earth[800] }}>{t.creditScore}</p>
-                <p style={{ fontSize: '14px', color: theme.colors.earth[500] }}>/ {t.maxScore}</p>
-                <span style={{ marginLeft: 'auto', background: theme.colors.green[100], color: theme.colors.earth[800], fontSize: '11px', padding: '3px 10px', borderRadius: '20px', fontWeight: '500' }}>Good standing</span>
+      <Grid>
+        <div>
+          <BigCard>
+            <CardBrand>AGORA · BUSINESS IDENTITY</CardBrand>
+            <CardAvatar>{t.initials}</CardAvatar>
+            <CardName>{t.name}</CardName>
+            <CardTrade>{t.trade} · {t.market}, {t.state}</CardTrade>
+            <CardDivider />
+            <CardGrid>
+              <CardField><CFL>BUSINESS ID</CFL><CFV>{t.id}</CFV></CardField>
+              <CardField><CFL>MEMBER SINCE</CFL><CFV>{t.memberSince}</CFV></CardField>
+              <CardField><CFL>BVN LINKED</CFL><CFV>{t.bvn}</CFV></CardField>
+              <CardField><CFL>CREDIT SCORE</CFL><CFV gold>{t.creditScore} / {t.maxScore}</CFV></CardField>
+            </CardGrid>
+            <CardFooter>
+              <div>
+                <p style={{ fontSize: '10px', color: theme.colors.earth[500], marginBottom: '4px' }}>Powered by</p>
+                <p style={{ fontSize: '13px', fontWeight: '500', color: theme.colors.earth[800] }}>KoraPay</p>
               </div>
-              <ScoreBar>
-                <ScoreBg><ScoreFill pct={(t.creditScore / t.maxScore) * 100} /></ScoreBg>
-                <ScoreTicks>
-                  <ScoreTick>0</ScoreTick>
-                  <ScoreTick>Poor</ScoreTick>
-                  <ScoreTick>Fair</ScoreTick>
-                  <ScoreTick>Good</ScoreTick>
-                  <ScoreTick>850</ScoreTick>
-                </ScoreTicks>
-              </ScoreBar>
-              <p style={{ fontSize: '12px', color: theme.colors.earth[500], marginTop: '10px', lineHeight: '1.6' }}>Your score grows every time a customer pays you through your KoraPay link. Keep transacting to unlock more.</p>
-            </Card>
+              <VerifiedPill><CheckCircle size={12} /> BVN Verified</VerifiedPill>
+              <QrBox>⊞</QrBox>
+            </CardFooter>
+          </BigCard>
 
-            <Card delay="0.2s">
-              <SectionTitle>Share your ID</SectionTitle>
-              <p style={{ fontSize: '13px', color: theme.colors.earth[500], marginBottom: '10px' }}>Copy your Business ID to share with banks, suppliers, or government portals.</p>
-              <LinkBox>
-                <LinkText>{t.id}</LinkText>
-                <CopyBtn copied={copied} onClick={copy}>
-                  {copied ? <><CheckCircle size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
-                </CopyBtn>
-              </LinkBox>
-            </Card>
-          </RightPanel>
-        </Grid>
-      </Page>
-    </AppLayout>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
+            <Button variant="outline" style={{ flex: 1 }}>
+              <Share2 size={15} /> Share ID
+            </Button>
+            <Button variant="gold" style={{ flex: 1 }}>
+              <Download size={15} /> Download
+            </Button>
+          </div>
+        </div>
+
+        <RightPanel>
+          <Card delay="0.1s">
+            <SectionTitle>ID details</SectionTitle>
+            {[
+              ['Full name', t.name],
+              ['Business ID', t.id],
+              ['Trade type', t.trade],
+              ['Market', t.market],
+              ['State', t.state],
+              ['Phone', t.phone],
+              ['BVN status', '✓ Verified'],
+              ['Member since', t.memberSince],
+            ].map(([label, val]) => (
+              <InfoRow key={label}>
+                <InfoLabel>{label}</InfoLabel>
+                <InfoVal style={val.startsWith('✓') ? { color: theme.colors.earth[800] } : {}}>{val}</InfoVal>
+              </InfoRow>
+            ))}
+          </Card>
+
+          <Card delay="0.15s">
+            <SectionTitle>Credit score</SectionTitle>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
+              <p style={{ fontFamily: 'var(--font-display)', fontSize: '36px', fontWeight: '700', color: theme.colors.earth[800] }}>{t.creditScore}</p>
+              <p style={{ fontSize: '14px', color: theme.colors.earth[500] }}>/ {t.maxScore}</p>
+              <span style={{ marginLeft: 'auto', background: theme.colors.green[100], color: theme.colors.earth[800], fontSize: '11px', padding: '3px 10px', borderRadius: '20px', fontWeight: '500' }}>Good standing</span>
+            </div>
+            <ScoreBar>
+              <ScoreBg><ScoreFill pct={(t.creditScore / t.maxScore) * 100} /></ScoreBg>
+              <ScoreTicks>
+                <ScoreTick>0</ScoreTick>
+                <ScoreTick>Poor</ScoreTick>
+                <ScoreTick>Fair</ScoreTick>
+                <ScoreTick>Good</ScoreTick>
+                <ScoreTick>850</ScoreTick>
+              </ScoreTicks>
+            </ScoreBar>
+            <p style={{ fontSize: '12px', color: theme.colors.earth[500], marginTop: '10px', lineHeight: '1.6' }}>Your score grows every time a customer pays you through your KoraPay link. Keep transacting to unlock more.</p>
+          </Card>
+
+          <Card delay="0.2s">
+            <SectionTitle>Share your ID</SectionTitle>
+            <p style={{ fontSize: '13px', color: theme.colors.earth[500], marginBottom: '10px' }}>Copy your Business ID to share with banks, suppliers, or government portals.</p>
+            <LinkBox>
+              <LinkText>{t.id}</LinkText>
+              <CopyBtn copied={copied} onClick={copy}>
+                {copied ? <><CheckCircle size={13} /> Copied</> : <><Copy size={13} /> Copy</>}
+              </CopyBtn>
+            </LinkBox>
+          </Card>
+        </RightPanel>
+      </Grid>
+    </Page>
   )
 }

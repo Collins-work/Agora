@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
+import { useState } from 'react'
+import styled, { useTheme } from 'styled-components'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { Shield, CheckCircle, ArrowRight, AlertTriangle, Package } from 'lucide-react'
@@ -44,9 +44,17 @@ const plans = [
 ]
 
 export default function Insurance() {
+  const theme = useTheme()
+  const [insured, setInsured] = useState({})
+
+  const handleGetCovered = (id) => {
+    setInsured(prev => ({ ...prev, [id]: true }))
+    setTimeout(() => {
+      setInsured(prev => ({ ...prev, [id]: 'success' }))
+    }, 1500)
+  }
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Insurance</SectionTitle>
 
         <HeroBanner>
@@ -54,7 +62,7 @@ export default function Insurance() {
             <p style={{ fontSize: '20px', fontWeight: '600', fontFamily: 'var(--font-display)', marginBottom: '6px' }}>
               Protect your stock and business ✓
             </p>
-            <p style={{ fontSize: '13px', color: theme.colors.earth[200], marginBottom: '1rem', lineHeight: '1.6' }}>
+            <p style={{ fontSize: '13px', color: theme.colors.earth[300], marginBottom: '1rem', lineHeight: '1.6' }}>
               Your credit score of {currentTrader.creditScore} qualifies you for all three insurance plans.<br />
               Premiums start at just ₦1,500/month — paid automatically from KoraPay collections.
             </p>
@@ -96,8 +104,15 @@ export default function Insurance() {
                     <CoverItem key={item}><CheckCircle size={12} color="#0F5F43" /> {item}</CoverItem>
                   ))}
                 </CoverList>
-                <Button variant={plan.featured ? 'gold' : 'outline'} fullWidth>
-                  Get covered <ArrowRight size={13} />
+                <Button 
+                  variant={insured[plan.id] === 'success' ? 'outline' : plan.featured ? 'gold' : 'outline'} 
+                  fullWidth 
+                  onClick={() => !insured[plan.id] && handleGetCovered(plan.id)}
+                  disabled={insured[plan.id] === true}
+                >
+                  {insured[plan.id] === 'success' ? <><CheckCircle size={14} /> Plan active</> 
+                    : insured[plan.id] === true ? 'Activating...' 
+                    : <>Get covered <ArrowRight size={13} /></>}
                 </Button>
               </InsBody>
             </InsCard>
@@ -122,6 +137,5 @@ export default function Insurance() {
           </div>
         </Card>
       </Page>
-    </AppLayout>
-  )
+    )
 }

@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
+import { useState } from 'react'
+import styled, { useTheme } from 'styled-components'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { Building2, CheckCircle, ArrowRight, TrendingUp, Clock } from 'lucide-react'
@@ -76,10 +76,18 @@ const loans = [
 ]
 
 export default function Loans() {
+  const theme = useTheme()
   const t = currentTrader
+  const [applied, setApplied] = useState({})
+
+  const handleApply = (id) => {
+    setApplied(prev => ({ ...prev, [id]: true }))
+    setTimeout(() => {
+      setApplied(prev => ({ ...prev, [id]: 'success' }))
+    }, 1500)
+  }
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Loans</SectionTitle>
 
         <HeroBanner>
@@ -88,7 +96,7 @@ export default function Loans() {
             <BannerSub>Based on your credit score of {t.creditScore} and 5 months of consistent KoraPay transactions</BannerSub>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div>
-                <p style={{ fontSize: '11px', color: theme.colors.earth[500], marginBottom: '2px' }}>Maximum loan amount</p>
+                <p style={{ fontSize: '11px', color: theme.colors.earth[400], marginBottom: '2px' }}>Maximum loan amount</p>
                 <MaxLoan>₦250,000</MaxLoan>
               </div>
               <div style={{ fontSize: '13px', color: theme.colors.earth[200], lineHeight: '1.6' }}>
@@ -127,7 +135,16 @@ export default function Loans() {
                   ))}
                 </LoanDetails>
                 {loan.status === 'ready' ? (
-                  <Button variant={loan.featured ? 'gold' : 'outline'} fullWidth>Apply now <ArrowRight size={13} /></Button>
+                  <Button 
+                    variant={applied[loan.id] === 'success' ? 'outline' : loan.featured ? 'gold' : 'outline'} 
+                    fullWidth 
+                    onClick={() => !applied[loan.id] && handleApply(loan.id)}
+                    disabled={applied[loan.id] === true}
+                  >
+                    {applied[loan.id] === 'success' ? <><CheckCircle size={14} /> Application sent</> 
+                      : applied[loan.id] === true ? 'Processing...' 
+                      : <>{loan.featured ? 'Apply now' : 'Start application'} <ArrowRight size={13} /></>}
+                  </Button>
                 ) : loan.status === 'soon' ? (
                   <Button variant="outline" fullWidth disabled>Score {loan.minScore} needed</Button>
                 ) : (
@@ -155,6 +172,5 @@ export default function Loans() {
           ))}
         </StepsCard>
       </Page>
-    </AppLayout>
-  )
+    )
 }

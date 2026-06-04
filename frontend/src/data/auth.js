@@ -27,7 +27,19 @@ const maskDemoAccount = account => ({
 
 const seedAccounts = () => {
     const accounts = readJSON(ACCOUNTS_KEY, [])
-    if (accounts.some(account => account.id === demoAccount.id)) return accounts
+    const demoIndex = accounts.findIndex(account => account.id === demoAccount.id)
+    
+    if (demoIndex >= 0) {
+        // Merge latest demo account data (like opportunities) into existing demo session
+        accounts[demoIndex] = { ...maskDemoAccount(demoAccount), ...accounts[demoIndex] }
+        // Ensure opportunities is specifically updated if it was empty
+        if (!accounts[demoIndex].opportunities || accounts[demoIndex].opportunities.length === 0) {
+            accounts[demoIndex].opportunities = demoAccount.opportunities
+        }
+        writeJSON(ACCOUNTS_KEY, accounts)
+        return accounts
+    }
+    
     const seeded = [maskDemoAccount(demoAccount), ...accounts]
     writeJSON(ACCOUNTS_KEY, seeded)
     return seeded

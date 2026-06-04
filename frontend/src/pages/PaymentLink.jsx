@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
 import { Button, Card, SectionTitle, Input, Label, FormGroup } from '../components/ui'
 import { currentTrader, transactions } from '../data/mockData'
 import { Copy, CheckCircle, Share2, QrCode, ArrowDownLeft, ExternalLink, Zap } from 'lucide-react'
@@ -94,8 +93,7 @@ export default function PaymentLink() {
   const totalViaKora = inbound.reduce((s, tx) => s + tx.amount, 0)
 
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Payment Link</SectionTitle>
         <Grid>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -175,8 +173,7 @@ export default function PaymentLink() {
           </div>
         </Grid>
       </Page>
-    </AppLayout>
-  )
+    )
 }
 
 function Download({ size }) {

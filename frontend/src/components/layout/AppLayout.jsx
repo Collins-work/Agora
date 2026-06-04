@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import Sidebar from './Sidebar'
+import { Outlet } from 'react-router-dom'
 
 const Shell = styled.div`
   display: flex;
@@ -12,11 +13,11 @@ const Main = styled.main`
   overflow-y: auto;
 `
 
-export default function AppLayout({ children }) {
+export default function AppLayout() {
   return (
     <Shell>
       <Sidebar />
-      <Main>{children}</Main>
+      <Main><Outlet /></Main>
     </Shell>
   )
 }

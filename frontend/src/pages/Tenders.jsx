@@ -1,5 +1,4 @@
 import styled, { useTheme } from 'styled-components'
-import AppLayout from '../components/layout/AppLayout'
 import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { FileText, Lock, ArrowRight, Building2, Clock, CheckCircle } from 'lucide-react'
@@ -62,8 +61,7 @@ export default function Tenders() {
   const ptsAway = needed - t.creditScore
 
   return (
-    <AppLayout>
-      <Page>
+    <Page>
         <SectionTitle mb="1.25rem">Government Tenders</SectionTitle>
 
         <LockedBanner>
@@ -133,6 +131,5 @@ export default function Tenders() {
           </div>
         </Card>
       </Page>
-    </AppLayout>
-  )
+    )
 }
