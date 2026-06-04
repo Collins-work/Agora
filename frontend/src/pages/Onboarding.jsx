@@ -15,6 +15,8 @@ const Page = styled.div`
   grid-template-columns: 1fr 1fr;
   font-family: ${p => p.theme.fonts.body};
 `
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const Left = styled.div`
   background: ${p => p.theme.colors.earth[700]};
   padding: 3rem;
@@ -182,7 +184,7 @@ export default function Onboarding() {
     setLoading(true)
     setOtpError('')
     try {
-      const res = await fetch('http://localhost:4000/api/verify-otp', {
+      const res = await fetch(`${API_URL}/api/verify-otp`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
@@ -219,9 +221,12 @@ export default function Onboarding() {
       const body = { method }
       if (method === 'sms') body.phone = form.phone
       else body.email = form.email
-      const res = await fetch('http://localhost:4000/api/send-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const res = await fetch(`${API_URL}/api/send-otp`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const data = await res.json()
-      if (!data?.success) setOtpError(data?.message || 'Failed to send OTP')
+      if (!data?.success) return setOtpError(data?.message || 'Failed to send OTP')
+      if (data?.mockOtp) {
+        setOtp([...(data.mockOtp || '')].slice(0, 6))
+      }
     } catch (err) {
       setOtpError('Failed to send OTP')
     } finally { setOtpSending(false) }

@@ -182,9 +182,11 @@ export default function Login() {
 
   const useDemo = () => {
     saveAccount(demo)
+    setActiveAccount(demo.id)
     setIdentifier(demo.email)
     setPin(demo.pin)
     setError('')
+    navigate('/dashboard')
   }
 
   return (

@@ -336,7 +336,7 @@ app.post('/api/send-otp', async (req, res) => {
     }
     // Fallback: mock send
     console.log(`(mock) Email OTP for ${email}: ${otp}`)
-    return res.json({ success: true, message: `OTP (mock) logged for ${email}` })
+    return res.json({ success: true, message: `OTP (mock) logged for ${email}`, mockOtp: otp })
   }
 
   // Send SMS if phone provided
@@ -358,7 +358,7 @@ app.post('/api/send-otp', async (req, res) => {
     }
     // Fallback: mock send
     console.log(`(mock) SMS OTP for ${phone}: ${otp}`)
-    return res.json({ success: true, message: `OTP (mock) logged for ${phone}` })
+    return res.json({ success: true, message: `OTP (mock) logged for ${phone}`, mockOtp: otp })
   }
 
   res.status(400).json({ success: false, message: 'No destination provided for OTP' })
@@ -372,7 +372,12 @@ app.post('/api/verify-otp', (req, res) => {
   else return res.status(400).json({ success: false, message: 'phone or email required' })
 
   const record = otpStore.get(key)
-  if (!record) return res.json({ success: false, verified: false, message: 'No OTP found or expired' })
+  if (!record) {
+    if (USE_MOCK_OTP) {
+      return res.json({ success: true, verified: true, message: 'Mock OTP accepted' })
+    }
+    return res.json({ success: false, verified: false, message: 'No OTP found or expired' })
+  }
   if (Date.now() > record.expiresAt) { otpStore.delete(key); return res.json({ success: false, verified: false, message: 'OTP expired' }) }
   const ok = record.code === String(otp)
   if (ok) otpStore.delete(key)
