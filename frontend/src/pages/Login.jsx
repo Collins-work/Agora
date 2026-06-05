@@ -157,6 +157,7 @@ const Row = styled.div`
   @media (max-width: 700px) {
     grid-template-columns: 1fr;
   }
+`
 
 const Actions = styled.div`
   display: flex;

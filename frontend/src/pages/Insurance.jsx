@@ -64,6 +64,14 @@ const InsPrice = styled.p`font-size:22px;font-weight:700;color:${p => p.theme.co
 const InsPeriod = styled.p`font-size:12px;color:${p => p.theme.colors.earth[500]};margin-bottom:1rem;`
 const CoverList = styled.div`display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;`
 const CoverItem = styled.div`display:flex;align-items:center;gap:6px;font-size:12px;color:${p => p.theme.colors.earth[600]};`
+const StepsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`
 
 const plans = [
   { id: 1, name: 'Basic Cover', provider: 'AXA Mansard', icon: <Shield />, price: '₦1,500', period: '/month', coverage: 'Up to ₦150,000', items: ['Fire & flood damage', 'Theft & burglary', 'Stock loss'], featured: false, status: 'ready' },
@@ -109,14 +117,6 @@ export default function Insurance() {
             <p style={{ fontSize: '11px', color: theme.colors.earth[500], marginBottom: '4px' }}>Why you need it</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {['Market fires happen', 'Theft & flooding risk', 'Protect your investment'].map(r => (
-              const StepsGrid = styled.div`
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 1rem;
-                @media (max-width: 900px) {
-                  grid-template-columns: 1fr;
-                }
-              `
                 <div key={r} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: theme.colors.earth[200] }}>
                   <AlertTriangle size={12} color="#1976D2" /> {r}
                 </div>
