@@ -159,6 +159,17 @@ const OppSub = styled.p`font-size:11px;color:${p => p.theme.colors.earth[400]};`
 const fmt = n => '₦' + n.toLocaleString()
 const CIRCUMFERENCE = 2 * Math.PI * 34
 
+const getGreeting = () => {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'morning'
+  if (hour < 17) return 'afternoon'
+  return 'evening'
+}
+
+const getCurrentDate = () => {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 const IC_MAP = {
   loan: <Library />,
   insurance: <Shield />,
@@ -176,8 +187,8 @@ export default function Dashboard() {
     <Page>
       <TopBar>
           <div>
-            <Greeting>Good morning, {t.name.split(' ')[0]} 👋</Greeting>
-            <Sub>Friday, 30 May 2026 &nbsp;·&nbsp; {t.market}</Sub>
+            <Greeting>Good {getGreeting()}, {t.name.split(' ')[0]} 👋</Greeting>
+            <Sub>{getCurrentDate()} · {t.market}</Sub>
           </div>
           <TopRight>
             <NotifBtn><Bell size={17} /></NotifBtn>
@@ -272,7 +283,7 @@ export default function Dashboard() {
                 <ChevronRight size={15} style={{ marginLeft: 'auto', color: theme.colors.earth[500] }} />
               </div>
               <div style={{ background: '#F4FBFF', borderRadius: '8px', padding: '8px 10px', fontFamily: 'monospace', fontSize: '11px', color: theme.colors.earth[800], wordBreak: 'break-all' }}>
-                pay.korapay.com/mp/amara-okonkwo
+                {t.paymentLink || 'No payment link configured yet'}
               </div>
             </Card>
           </div>
@@ -284,7 +295,7 @@ export default function Dashboard() {
               <SectionTitle mb="0">Recent transactions</SectionTitle>
               <span style={{ fontSize: '12px', color: theme.colors.earth[800], cursor: 'pointer', fontWeight: '500' }} onClick={() => navigate('/transactions')}>View all →</span>
             </div>
-            {transactions.slice(0, 5).map(tx => (
+            {transactions.length ? transactions.slice(0, 5).map(tx => (
               <TxnRow key={tx.id}>
                 <TxnLeft>
                   <TxnIcon type={tx.type}>{tx.type === 'in' ? <ArrowDownLeft /> : <ArrowUpRight />}</TxnIcon>
@@ -295,7 +306,9 @@ export default function Dashboard() {
                 </TxnLeft>
                 <TxnAmt type={tx.type}>{tx.type === 'in' ? '+' : '-'}{fmt(tx.amount)}</TxnAmt>
               </TxnRow>
-            ))}
+            )) : (
+              <p style={{ padding: '1.5rem 0', textAlign: 'center', color: theme.colors.earth[500] }}>No transactions yet — your activity will appear here as soon as you receive payments.</p>
+            )}
           </Card>
 
           <Card delay="0.25s">
@@ -303,7 +316,7 @@ export default function Dashboard() {
               <SectionTitle mb="0">Opportunities unlocked</SectionTitle>
               <span style={{ fontSize: '12px', color: theme.colors.earth[800], cursor: 'pointer', fontWeight: '500' }} onClick={() => navigate('/opportunities')}>View all →</span>
             </div>
-            {opportunities.map(o => (
+            {opportunities.length ? opportunities.map(o => (
               <OppCard key={o.id} onClick={() => navigate('/opportunities')}>
                 <OppIcon>{IC_MAP[o.type] || <TrendingUp />}</OppIcon>
                 <div style={{ flex: 1 }}>
@@ -314,7 +327,9 @@ export default function Dashboard() {
                   {o.status === 'ready' ? 'Ready' : o.status === 'soon' ? `${o.ptsAway} pts away` : `${o.scoreNeeded}+ needed`}
                 </Badge>
               </OppCard>
-            ))}
+            )) : (
+              <p style={{ padding: '1.5rem 0', textAlign: 'center', color: theme.colors.earth[500] }}>No opportunities unlocked yet — keep trading to qualify for them.</p>
+            )}
           </Card>
         </BottomGrid>
       </Page>

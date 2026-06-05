@@ -98,29 +98,30 @@ export const findAccountByIdentifier = (identifier, pin) => {
     }) || null
 }
 
-export const createAccountFromOnboarding = form => {
+export const createAccountFromOnboarding = (form, serverData = {}) => {
     const firstName = form.firstName.trim()
     const lastName = form.lastName.trim()
-    const businessId = `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
+    const businessId = serverData.businessId || `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
     const name = `${firstName} ${lastName}`.trim()
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+    const maskedBvn = form.bvn ? form.bvn.replace(/\d(?=\d{4})/g, '•') : 'Pending verification'
     const activeAccount = {
         id: businessId,
         name,
         initials: `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase(),
-        trade: form.tradeType || 'Trader',
-        market: form.market || 'Unknown market',
-        state: (form.market || '').split(',').pop()?.trim() || 'Nigeria',
-        bvn: form.bvn ? form.bvn.replace(/\d(?=\d{4})/g, '•') : 'Pending verification',
+        trade: form.tradeType || serverData.tradeType || 'Trader',
+        market: form.market || serverData.market || 'Unknown market',
+        state: (form.market || serverData.market || '').split(',').pop()?.trim() || 'Nigeria',
+        bvn: serverData.bvn ? String(serverData.bvn).replace(/\d(?=\d{4})/g, '•') : maskedBvn,
         phone: form.phone,
         email: form.email,
         pin: form.pin,
         memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        creditScore: 0,
-        maxScore: 850,
-        status: 'New account',
+        creditScore: serverData.creditScore ?? 0,
+        maxScore: serverData.maxScore ?? 850,
+        status: serverData.status || 'New account',
         loanReady: false,
-        paymentLink: `https://pay.korapay.com/agora/${slug}`,
+        paymentLink: serverData.paymentLink || `https://pay.korapay.com/agora/${slug}`,
         totalReceived: 0,
         totalTransactions: 0,
         uniqueCustomers: 0,

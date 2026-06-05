@@ -1,11 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled, { keyframes, useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input, Select, Label, FormGroup } from '../components/ui'
 import { markets, tradeTypes } from '../data/mockData'
 import { createAccountFromOnboarding } from '../data/auth'
 import { CheckCircle, ArrowRight, ArrowLeft, Shield, Smartphone } from 'lucide-react'
-import { useEffect } from 'react'
 
 const fadeUp = keyframes`from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}`
 
@@ -182,16 +181,57 @@ export default function Onboarding() {
   })
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
+  const [verifyLoading, setVerifyLoading] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState('sms')
   const [otpSending, setOtpSending] = useState(false)
   const [otpError, setOtpError] = useState('')
+  const [bvnError, setBvnError] = useState('')
+  const [bvnMessage, setBvnMessage] = useState('')
+  const [bvnVerified, setBvnVerified] = useState(false)
+  const [createdTrader, setCreatedTrader] = useState(null)
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
+  const verifyBVN = async () => {
+    if (!form.firstName || !form.lastName) {
+      setBvnError('Please enter both first and last name before verifying your BVN.')
+      return
+    }
+    if (!form.bvn || form.bvn.length !== 11) {
+      setBvnError('BVN must be 11 digits.')
+      return
+    }
+
+    setVerifyLoading(true)
+    setBvnError('')
+    setBvnMessage('')
+    try {
+      const res = await fetch(`${API_URL}/api/verify-bvn`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bvn: form.bvn, firstName: form.firstName, lastName: form.lastName })
+      })
+      const data = await res.json()
+      setVerifyLoading(false)
+      if (!data?.success) {
+        setBvnError(data?.message || 'BVN verification failed')
+        return
+      }
+      setBvnVerified(true)
+      setBvnMessage(data?.data?.message || 'BVN verified successfully.')
+      setStep(3)
+    } catch (err) {
+      setVerifyLoading(false)
+      setBvnError('BVN verification failed — please try again')
+    }
+  }
+
   const next = async () => {
+    if (step === 2) {
+      return verifyBVN()
+    }
     if (step < TOTAL_STEPS) return setStep(s => s + 1)
 
-    // Final step: verify OTP then create account locally
     const code = otp.join('')
     const payload = { otp: code }
     if (deliveryMethod === 'sms') payload.phone = form.phone
@@ -205,17 +245,25 @@ export default function Onboarding() {
         body: JSON.stringify(payload)
       })
       const data = await res.json()
-      setLoading(false)
-      if (!data?.verified) return setOtpError(data?.message || 'Invalid code — please try again')
-
-      // create account locally and set active session
-      try {
-        const account = createAccountFromOnboarding(form)
-        setStep(5)
-        navigate('/dashboard')
-      } catch (err) {
-        setOtpError('Account creation failed — please try again')
+      if (!data?.verified) {
+        setLoading(false)
+        return setOtpError(data?.message || 'Invalid code — please try again')
       }
+
+      const onboardRes = await fetch(`${API_URL}/api/onboard`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const onboardData = await onboardRes.json()
+      setLoading(false)
+      if (!onboardData?.success) {
+        return setOtpError(onboardData?.message || 'Unable to complete registration')
+      }
+
+      const account = createAccountFromOnboarding(form, onboardData.trader || {})
+      setCreatedTrader(account)
+      setStep(5)
+      navigate('/dashboard')
     } catch (err) {
       setLoading(false)
       setOtpError('Verification failed — try again')
@@ -311,6 +359,8 @@ export default function Onboarding() {
               <Label>Bank Verification Number (BVN)</Label>
               <Input placeholder="12345678901" maxLength={11} value={form.bvn} onChange={e => set('bvn', e.target.value)} />
               <BvnHint><Shield size={12} /> Your BVN is encrypted and never stored in full. Powered by KoraPay.</BvnHint>
+              {bvnError && <p style={{ color: '#D32F2F', fontSize: '12px', marginTop: '8px' }}>{bvnError}</p>}
+              {bvnMessage && <p style={{ color: '#166534', fontSize: '12px', marginTop: '8px' }}>{bvnMessage}</p>}
             </FormGroup>
             <div style={{ background: theme.colors.earth[50], border: `0.5px solid ${theme.colors.earth[100]}`, borderRadius: '10px', padding: '1rem', marginBottom: '1rem' }}>
               <p style={{ fontSize: '13px', fontWeight: '500', marginBottom: '4px', color: theme.colors.earth[800] }}>Why we need your BVN</p>
@@ -318,7 +368,9 @@ export default function Onboarding() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <Button variant="outline" onClick={back}><ArrowLeft size={15} /></Button>
-              <Button variant="gold" fullWidth onClick={next}>Verify & continue <ArrowRight size={15} /></Button>
+              <Button variant="gold" fullWidth onClick={next} disabled={verifyLoading}>
+                {verifyLoading ? 'Verifying...' : 'Verify & continue'} <ArrowRight size={15} />
+              </Button>
             </div>
           </FormWrap>
         )}
@@ -351,6 +403,10 @@ export default function Onboarding() {
                 <option>5–10 years</option>
                 <option>Over 10 years</option>
               </Select>
+            </FormGroup>
+            <FormGroup>
+              <Label>Create a 4-digit PIN</Label>
+              <Input type="password" maxLength={4} placeholder="Enter a PIN" value={form.pin} onChange={e => set('pin', e.target.value.replace(/[^0-9]/g, ''))} />
             </FormGroup>
             <div style={{ display: 'flex', gap: '10px' }}>
               <Button variant="outline" onClick={back}><ArrowLeft size={15} /></Button>
@@ -412,11 +468,11 @@ export default function Onboarding() {
             <p style={{ fontSize: '14px', color: theme.colors.earth[500], marginBottom: '6px' }}>Your Business ID is ready</p>
             <div style={{ background: theme.colors.earth[800], borderRadius: '12px', padding: '1.25rem', color: theme.colors.earth[50], margin: '1.25rem 0', textAlign: 'left' }}>
               <p style={{ fontSize: '11px', color: theme.colors.earth[50], fontWeight: '600', letterSpacing: '0.08em', marginBottom: '8px' }}>AGORA · VERIFIED ID</p>
-              <p style={{ fontSize: '16px', fontWeight: '500' }}>{form.firstName} {form.lastName}</p>
-              <p style={{ fontSize: '12px', color: theme.colors.earth[50], marginBottom: '10px' }}>{form.tradeType} · {form.market}</p>
+              <p style={{ fontSize: '16px', fontWeight: '500' }}>{createdTrader?.name || `${form.firstName} ${form.lastName}`}</p>
+              <p style={{ fontSize: '12px', color: theme.colors.earth[50], marginBottom: '10px' }}>{createdTrader?.trade || form.tradeType} · {createdTrader?.market || form.market}</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <div><p style={{ fontSize: '10px', color: theme.colors.earth[50] }}>Business ID</p><p style={{ fontSize: '13px', fontWeight: '500' }}>AG-LG-00419</p></div>
-                <div><p style={{ fontSize: '10px', color: theme.colors.earth[50] }}>Credit score</p><p style={{ fontSize: '13px', fontWeight: '500', color: theme.colors.earth[50] }}>500 / 850</p></div>
+                <div><p style={{ fontSize: '10px', color: theme.colors.earth[50] }}>Business ID</p><p style={{ fontSize: '13px', fontWeight: '500' }}>{createdTrader?.businessId || createdTrader?.id || 'AG-LG-XXXX'}</p></div>
+                <div><p style={{ fontSize: '10px', color: theme.colors.earth[50] }}>Credit score</p><p style={{ fontSize: '13px', fontWeight: '500', color: theme.colors.earth[50] }}>{createdTrader?.creditScore ?? 500} / 850</p></div>
               </div>
             </div>
             <Button variant="gold" fullWidth onClick={() => navigate('/dashboard')}>

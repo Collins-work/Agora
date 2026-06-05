@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
 import { Card, SectionTitle, Button, Input, Label, FormGroup, Avatar, Divider } from '../components/ui'
-import { currentTrader } from '../data/mockData'
+import { currentTrader, saveAccount } from '../data/auth'
 import { User, Shield, Bell, Link2, CheckCircle } from 'lucide-react'
 
 const Page = styled.div`
@@ -66,8 +66,28 @@ export default function Settings() {
   const [tab, setTab] = useState('profile')
   const [saved, setSaved] = useState(false)
   const [notifs, setNotifs] = useState({ payment: true, score: true, opportunities: false, weekly: true })
+  const [profile, setProfile] = useState({
+    firstName: t.name?.split(' ')[0] || '',
+    lastName: t.name?.split(' ').slice(1).join(' ') || '',
+    phone: t.phone || '',
+    email: t.email || '',
+    market: t.market || '',
+    tradeType: t.trade || '',
+  })
 
-  const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+  const save = () => {
+    const nextAccount = {
+      ...t,
+      name: `${profile.firstName} ${profile.lastName}`.trim(),
+      phone: profile.phone,
+      email: profile.email,
+      market: profile.market,
+      trade: profile.tradeType,
+    }
+    saveAccount(nextAccount)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
 
   return (
     <Page>
@@ -98,13 +118,31 @@ export default function Settings() {
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <FormGroup><Label>First name</Label><Input defaultValue="Amara" /></FormGroup>
-                  <FormGroup><Label>Last name</Label><Input defaultValue="Okonkwo" /></FormGroup>
+                  <FormGroup>
+                    <Label>First name</Label>
+                    <Input value={profile.firstName} onChange={e => setProfile(prev => ({ ...prev, firstName: e.target.value }))} />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Last name</Label>
+                    <Input value={profile.lastName} onChange={e => setProfile(prev => ({ ...prev, lastName: e.target.value }))} />
+                  </FormGroup>
                 </div>
-                <FormGroup><Label>Phone number</Label><Input defaultValue="080••••••34" disabled /></FormGroup>
-                <FormGroup><Label>Email address</Label><Input defaultValue="amara@example.com" /></FormGroup>
-                <FormGroup><Label>Market</Label><Input defaultValue="Balogun Market, Lagos" disabled /></FormGroup>
-                <FormGroup><Label>Trade type</Label><Input defaultValue="Textile Trader" /></FormGroup>
+                <FormGroup>
+                  <Label>Phone number</Label>
+                  <Input value={profile.phone} disabled />
+                </FormGroup>
+                <FormGroup>
+                  <Label>Email address</Label>
+                  <Input value={profile.email} onChange={e => setProfile(prev => ({ ...prev, email: e.target.value }))} />
+                </FormGroup>
+                <FormGroup>
+                  <Label>Market</Label>
+                  <Input value={profile.market} disabled />
+                </FormGroup>
+                <FormGroup>
+                  <Label>Trade type</Label>
+                  <Input value={profile.tradeType} onChange={e => setProfile(prev => ({ ...prev, tradeType: e.target.value }))} />
+                </FormGroup>
                 <Button variant="gold" onClick={save}>
                   {saved ? <><CheckCircle size={14} /> Saved!</> : 'Save changes'}
                 </Button>

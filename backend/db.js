@@ -35,6 +35,8 @@ const initDb = async () => {
       phone TEXT NOT NULL,
       email TEXT,
       bvn_hash TEXT,
+      bvn_masked TEXT,
+      pin_hash TEXT,
       market TEXT,
       trade_type TEXT,
       payment_link TEXT,

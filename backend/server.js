@@ -116,7 +116,49 @@ app.post('/api/register', async (req, res) => {
 })
 
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body
+  const { identifier, pin, email, password } = req.body
+
+  if (identifier && pin) {
+    try {
+      const result = await query(
+        `SELECT business_id, first_name, last_name, phone, email, market, trade_type, payment_link, credit_score, created_at, bvn_hash, pin_hash
+         FROM traders
+         WHERE business_id = $1 OR email = $1 OR phone = $1
+         LIMIT 1`,
+        [identifier]
+      )
+      if (!result.rowCount) {
+        return res.status(401).json({ success: false, message: 'Invalid identifier or PIN' })
+      }
+
+      const trader = result.rows[0]
+      const pinValid = await bcrypt.compare(pin, trader.pin_hash || '')
+      if (!pinValid) {
+        return res.status(401).json({ success: false, message: 'Invalid identifier or PIN' })
+      }
+
+      return res.json({
+        success: true,
+        trader: {
+          businessId: trader.business_id,
+          firstName: trader.first_name,
+          lastName: trader.last_name,
+          phone: trader.phone,
+          email: trader.email,
+          market: trader.market,
+          tradeType: trader.trade_type,
+          paymentLink: trader.payment_link,
+          creditScore: trader.credit_score,
+          memberSince: trader.created_at,
+          bvn: trader.bvn_masked || 'Pending verification',
+        },
+      })
+    } catch (err) {
+      console.error('Login error:', err.message)
+      return res.status(500).json({ success: false, message: 'Unable to login' })
+    }
+  }
+
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Email and password are required' })
   }
@@ -178,9 +220,9 @@ app.post('/api/verify-bvn', async (req, res) => {
 
 // ── Create trader onboarding & generate payment link ──────────────────────
 app.post('/api/onboard', async (req, res) => {
-  const { firstName, lastName, phone, email, bvn, market, tradeType } = req.body
-  if (!firstName || !phone || !bvn) {
-    return res.status(400).json({ success: false, message: 'First name, phone, and BVN are required' })
+  const { firstName, lastName, phone, email, bvn, market, tradeType, pin } = req.body
+  if (!firstName || !phone || !bvn || !pin) {
+    return res.status(400).json({ success: false, message: 'First name, phone, BVN, and PIN are required' })
   }
 
   const businessId = `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
@@ -188,7 +230,9 @@ app.post('/api/onboard', async (req, res) => {
 
   try {
     const user = await getOrCreateUser({ email, phone, firstName, lastName })
+    const bvnMasked = bvn ? bvn.replace(/\d(?=\d{4})/g, '•') : null
     const bvnHash = bvn ? await bcrypt.hash(bvn, SALT_ROUNDS) : null
+    const pinHash = pin ? await bcrypt.hash(pin, SALT_ROUNDS) : null
 
     // Create a KoraPay payment link for the trader
     const linkRes = await korapay.post('/transactions/initialize/link', {
@@ -202,15 +246,29 @@ app.post('/api/onboard', async (req, res) => {
 
     const paymentLink = linkRes.data?.data?.link || `https://pay.korapay.com/agora/${slug}`
 
-    await query(
-      `INSERT INTO traders (user_id, business_id, first_name, last_name, phone, email, bvn_hash, market, trade_type, payment_link, credit_score)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-      [user?.id || null, businessId, firstName, lastName, phone, email, bvnHash, market, tradeType, paymentLink, 500]
+    const insertRes = await query(
+      `INSERT INTO traders (user_id, business_id, first_name, last_name, phone, email, bvn_hash, bvn_masked, pin_hash, market, trade_type, payment_link, credit_score)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       RETURNING business_id, first_name, last_name, phone, email, bvn_masked, market, trade_type, payment_link, credit_score, created_at`,
+      [user?.id || null, businessId, firstName, lastName, phone, email, bvnHash, bvnMasked, pinHash, market, tradeType, paymentLink, 500]
     )
 
+    const inserted = insertRes.rows[0]
     res.json({
       success: true,
-      trader: { businessId, firstName, lastName, phone, email, market, tradeType, paymentLink, creditScore: 500 },
+      trader: {
+        businessId: inserted.business_id,
+        firstName: inserted.first_name,
+        lastName: inserted.last_name,
+        phone: inserted.phone,
+        email: inserted.email,
+        market: inserted.market,
+        tradeType: inserted.trade_type,
+        paymentLink: inserted.payment_link,
+        creditScore: inserted.credit_score,
+        memberSince: inserted.created_at,
+        bvn: inserted.bvn_masked || 'Pending verification',
+      },
     })
   } catch (err) {
     console.warn('Onboard failed, using mock fallback:', err.message)
@@ -229,6 +287,8 @@ app.post('/api/onboard', async (req, res) => {
         tradeType,
         paymentLink,
         creditScore: 500,
+        memberSince: new Date().toISOString(),
+        bvn: bvn.replace(/\d(?=\d{4})/g, '•'),
       },
     })
   }

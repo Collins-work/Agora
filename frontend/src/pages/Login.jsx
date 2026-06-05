@@ -5,6 +5,8 @@ import { ArrowRight, Shield, UserCheck, KeyRound, Home, Mail } from 'lucide-reac
 import { Button, Input, Label, FormGroup } from '../components/ui'
 import { demo, findAccountByIdentifier, saveAccount, setActiveAccount } from '../data/auth'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+
 const Page = styled.div`
   min-height: 100vh;
   display: grid;
@@ -183,13 +185,64 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const account = findAccountByIdentifier(identifier, pin)
-      if (!account) {
-        setError('Invalid Business ID, email, phone number, or PIN.')
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, pin }),
+      })
+      const data = await res.json()
+      if (data?.success && data?.trader) {
+        saveAccount({
+          id: data.trader.businessId || data.trader.id,
+          name: `${data.trader.firstName || ''} ${data.trader.lastName || ''}`.trim(),
+          initials: `${(data.trader.firstName || '')[0] || ''}${(data.trader.lastName || '')[0] || ''}`.toUpperCase(),
+          trade: data.trader.tradeType || data.trader.trade || 'Trader',
+          market: data.trader.market || data.trader.location || '',
+          state: (data.trader.market || '').split(',').pop()?.trim() || 'Nigeria',
+          bvn: data.trader.bvn || data.trader.maskedBvn || 'Pending verification',
+          phone: data.trader.phone,
+          email: data.trader.email,
+          pin,
+          memberSince: data.trader.memberSince || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          creditScore: data.trader.creditScore ?? 0,
+          maxScore: data.trader.maxScore ?? 850,
+          status: data.trader.status || 'Active',
+          loanReady: data.trader.loanReady ?? false,
+          paymentLink: data.trader.paymentLink || `https://pay.korapay.com/agora/${(data.trader.firstName || '').toLowerCase()}-${(data.trader.lastName || '').toLowerCase()}`,
+          totalReceived: data.trader.totalReceived ?? 0,
+          totalTransactions: data.trader.totalTransactions ?? 0,
+          uniqueCustomers: data.trader.uniqueCustomers ?? 0,
+          monthlyGrowth: data.trader.monthlyGrowth ?? 0,
+          scoreGrowth: data.trader.scoreGrowth ?? 0,
+          newCustomers: data.trader.newCustomers ?? 0,
+          monthlyData: data.trader.monthlyData || [],
+          scoreHistory: data.trader.scoreHistory || [],
+          scoreFactors: data.trader.scoreFactors || [],
+          transactions: data.trader.transactions || [],
+          opportunities: data.trader.opportunities || [],
+          isDemo: false,
+        })
+        setActiveAccount(data.trader.businessId || data.trader.id)
+        navigate('/dashboard')
         return
       }
-      setActiveAccount(account.id)
-      navigate('/dashboard')
+
+      const account = findAccountByIdentifier(identifier, pin)
+      if (account) {
+        setActiveAccount(account.id)
+        navigate('/dashboard')
+        return
+      }
+
+      setError(data?.message || 'Invalid Business ID, email, phone number, or PIN.')
+    } catch (err) {
+      const account = findAccountByIdentifier(identifier, pin)
+      if (account) {
+        setActiveAccount(account.id)
+        navigate('/dashboard')
+      } else {
+        setError('Unable to login at this time. Please check your details.')
+      }
     } finally {
       setLoading(false)
     }

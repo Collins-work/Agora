@@ -4,15 +4,21 @@ import { getActiveAccount, getActiveCollections } from './auth'
 const createAccountProxy = () => new Proxy(demoAccount, {
     get(target, prop) {
         const activeAccount = getActiveAccount()
-        const source = activeAccount && prop in activeAccount ? activeAccount : target
-        return source[prop]
+        if (!activeAccount || activeAccount.isDemo) {
+            return target[prop]
+        }
+        return activeAccount[prop]
     },
 })
 
 const createArrayProxy = key => new Proxy(demoAccount[key], {
     get(target, prop) {
+        const activeAccount = getActiveAccount()
+        if (!activeAccount || activeAccount.isDemo) {
+            return Reflect.get(target, prop)
+        }
         const collections = getActiveCollections()
-        const source = collections[key].length ? collections[key] : target
+        const source = collections[key] && collections[key].length ? collections[key] : []
         return Reflect.get(source, prop)
     },
 })
