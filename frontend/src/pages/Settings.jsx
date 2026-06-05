@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
 import { Card, SectionTitle, Button, Input, Label, FormGroup, Avatar, Divider } from '../components/ui'
-import { currentTrader, saveAccount } from '../data/auth'
+import { currentTrader } from '../data/mockData'
+import { saveAccount } from '../data/auth'
 import { User, Shield, Bell, Link2, CheckCircle } from 'lucide-react'
 
 const Page = styled.div`
