@@ -5,7 +5,15 @@ import { Button, Card, SectionTitle, Input, Label, FormGroup } from '../componen
 import { currentTrader, transactions } from '../data/mockData'
 import { Copy, CheckCircle, Share2, QrCode, ArrowDownLeft, ExternalLink, Zap, ChevronLeft } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const Page = styled.div`
+  padding:1.75rem 2rem;
+  max-width:1000px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding:1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -13,7 +21,14 @@ const BackBtn = styled.button`
   transition:${p => p.theme.transition};
   &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
 `
-const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 const LinkCard = styled(Card)`
   background:${p => p.theme.colors.earth[800]};
@@ -42,7 +57,15 @@ const GoldBtn = styled(ActionBtn)`
   &:hover{background:${p => p.theme.colors.gold[400]};}
 `
 
-const StatsRow = styled.div`display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:1rem;`
+const StatsRow = styled.div`
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:1rem;
+  @media (max-width: 700px) {
+    grid-template-columns:1fr;
+  }
+`
 const StatBox = styled.div`
   background:rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;
   border:0.5px solid rgba(255,255,255,0.1);

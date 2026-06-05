@@ -31,6 +31,10 @@ const Nav = styled.nav`
   position: sticky;
   top: 0;
   z-index: 100;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr auto;
+    padding: 1rem 1rem;
+  }
 `
 const NavLogo = styled(NavLink)`
   font-family: ${p => p.theme.fonts.display};
@@ -60,6 +64,10 @@ const Hero = styled.section`
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
   align-items: center;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    padding: 3rem 1rem 2.5rem;
+  }
 `
 const HeroLeft = styled.div`
   animation: ${fadeUp} 0.6s ease both;
@@ -99,6 +107,10 @@ const HeroStats = styled.div`
   margin-top: 2.5rem;
   padding-top: 2rem;
   border-top: 0.5px solid ${p => p.theme.colors.earth[200]};
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
 `
 const HeroStat = styled.div``
 const HeroStatNum = styled.p`
@@ -143,7 +155,15 @@ const PreviewBrand = styled.p`
 `
 const PreviewName = styled.p`font-size: 18px; font-weight: 500; color: ${p => p.theme.colors.earth[50]};`
 const PreviewTrade = styled.p`font-size: 12px; color: ${p => p.theme.colors.earth[300]}; margin-bottom: 1rem;`
-const PreviewGrid = styled.div`display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;`
+const PreviewGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+`
 const PreviewField = styled.div``
 const PreviewFLabel = styled.p`font-size: 10px; color: ${p => p.theme.colors.earth[400]}; margin-bottom: 2px;`
 const PreviewFVal = styled.p`
@@ -185,6 +205,9 @@ const ProofGrid = styled.div`
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 1.5rem;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 const ProofCard = styled.div`
   background: ${p => p.theme.colors.white};

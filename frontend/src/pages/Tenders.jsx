@@ -4,7 +4,15 @@ import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { FileText, Lock, ArrowRight, Building2, Clock, CheckCircle, ChevronLeft } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const Page = styled.div`
+  padding:1.75rem 2rem;
+  max-width:1000px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding:1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -32,7 +40,14 @@ const ProgressLabel = styled.div`display:flex;justify-content:space-between;marg
 const ProgressTrack = styled.div`height:10px;background:${p => p.theme.colors.earth[200]};border-radius:5px;`
 const ProgressFill = styled.div`height:10px;border-radius:5px;background:${p => p.theme.colors.gold[500]};width:${p => p.pct}%;`
 
-const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:1rem;`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 const TenderCard = styled(Card)`
   padding:0;overflow:hidden;

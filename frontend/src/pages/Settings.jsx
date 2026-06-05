@@ -4,8 +4,24 @@ import { Card, SectionTitle, Button, Input, Label, FormGroup, Avatar, Divider } 
 import { currentTrader } from '../data/mockData'
 import { User, Shield, Bell, Link2, CheckCircle } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:820px;`
-const Grid = styled.div`display:grid;grid-template-columns:200px 1fr;gap:1.5rem;align-items:start;`
+const Page = styled.div`
+  padding:1.75rem 2rem;
+  max-width:820px;
+  margin:0 auto;
+  width:100%;
+  @media (max-width: 900px) {
+    padding:1.5rem 1rem;
+  }
+`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:200px 1fr;
+  gap:1.5rem;
+  align-items:start;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 const TabList = styled.div`display:flex;flex-direction:column;gap:4px;`
 const Tab = styled.button`
   display:flex;align-items:center;gap:10px;padding:10px 12px;

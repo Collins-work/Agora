@@ -8,7 +8,15 @@ import { useNavigate } from 'react-router-dom'
 
 const float = keyframes`0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}`
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:900px;`
+const Page = styled.div`
+  padding: 1.75rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding: 1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -17,7 +25,15 @@ const BackBtn = styled.button`
   &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
 `
 
-const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  align-items:start;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 const BigCard = styled.div`
   background:${p => p.theme.colors.earth[800]};
@@ -41,11 +57,28 @@ const CardAvatar = styled.div`
 const CardName = styled.p`font-size:20px;font-weight:500;margin-bottom:4px;`
 const CardTrade = styled.p`font-size:13px;color:${p => p.theme.colors.earth[300]};margin-bottom:1.5rem;`
 const CardDivider = styled.hr`border:none;border-top:0.5px solid rgba(255,255,255,0.15);margin:1rem 0;`
-const CardGrid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:12px;`
+const CardGrid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  @media (max-width: 700px) {
+    grid-template-columns:1fr;
+  }
+`
 const CardField = styled.div``
 const CFL = styled.p`font-size:10px;color:${p => p.theme.colors.earth[400]};margin-bottom:3px;letter-spacing:0.05em;`
 const CFV = styled.p`font-size:13px;font-weight:500;color:${p => p.theme.colors.earth[50]};`
-const CardFooter = styled.div`display:flex;align-items:flex-end;justify-content:space-between;margin-top:1.5rem;`
+const CardFooter = styled.div`
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  margin-top:1.5rem;
+  gap: 1rem;
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`
 const QrBox = styled.div`
   width:56px;height:56px;background:white;border-radius:8px;
   display:flex;align-items:center;justify-content:center;font-size:28px;
@@ -56,9 +89,25 @@ const VerifiedPill = styled.div`
   font-size:11px;padding:5px 12px;border-radius:20px;
 `
 
-const RightPanel = styled.div`display:flex;flex-direction:column;gap:1rem;`
+const RightPanel = styled.div`
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+`
 
-const InfoRow = styled.div`display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid ${p => p.theme.colors.earth[100]};&:last-child{border:none;}`
+const InfoRow = styled.div`
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:0.5px solid ${p => p.theme.colors.earth[100]};
+  &:last-child{border:none;}
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+`
 const InfoLabel = styled.p`font-size:13px;color:${p => p.theme.colors.earth[500]};`
 const InfoVal = styled.p`font-size:13px;font-weight:500;color:${p => p.theme.colors.earth[800]};`
 

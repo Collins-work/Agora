@@ -5,7 +5,15 @@ import { Card, SectionTitle, Badge, Button } from '../components/ui'
 import { opportunities, currentTrader } from '../data/mockData'
 import { TrendingUp, Shield, FileText, Building2, ArrowRight, Lock, CheckCircle, Clock, ChevronLeft } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const Page = styled.div`
+  padding:1.75rem 2rem;
+  max-width:1000px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding:1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -20,6 +28,11 @@ const ScoreBanner = styled.div`
   padding:1.5rem;
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:1.5rem;color:${p => p.theme.colors.earth[50]};
+  gap:1rem;
+  @media (max-width: 900px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `
 const BannerLeft = styled.div``
 const BannerTitle = styled.p`font-size:16px;font-weight:500;margin-bottom:4px;`
@@ -48,7 +61,14 @@ const MilestoneDot = styled.div`
 `
 const MilestoneLbl = styled.p`font-size:10px;color:${p => p.theme.colors.earth[400]};`
 
-const Grid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:1rem;`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 const OppCard = styled(Card)`
   display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;

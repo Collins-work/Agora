@@ -6,7 +6,15 @@ import { Card, SectionTitle, Badge, Input } from '../components/ui'
 import { transactions, monthlyData } from '../data/mockData'
 import { ArrowDownLeft, ArrowUpRight, Search, Filter, ChevronLeft } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const Page = styled.div`
+  padding: 1.75rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding: 1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -14,7 +22,15 @@ const BackBtn = styled.button`
   transition:${p => p.theme.transition};
   &:hover{color:${p => p.theme.colors.earth[800]};transform:translateX(-2px);}
 `
-const TopRow = styled.div`display:grid;grid-template-columns:1fr 320px;gap:1.25rem;margin-bottom:1.25rem;`
+const TopRow = styled.div`
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:1.25rem;
+  margin-bottom:1.25rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 const FilterBar = styled.div`
   display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;
@@ -56,7 +72,15 @@ const TxnAmt = styled.p`
 `
 const TxnCat = styled.p`font-size:11px;color:${p => p.theme.colors.earth[400]};margin-top:2px;`
 
-const SummaryGrid = styled.div`display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;`
+const SummaryGrid = styled.div`
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:1.25rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 const SumBox = styled.div`
   background:${p => p.theme.colors.white};border:0.5px solid ${p => p.theme.colors.earth[200]};
   border-radius:${p => p.theme.radius.lg};padding:1rem;

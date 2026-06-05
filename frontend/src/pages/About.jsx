@@ -25,6 +25,12 @@ const Nav = styled.nav`
   position: sticky;
   top: 0;
   z-index: 50;
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1rem;
+    justify-content: center;
+  }
 `
 
 const Logo = styled.button`
@@ -47,6 +53,10 @@ const Hero = styled.section`
   grid-template-columns: 1.1fr 0.9fr;
   gap: 2rem;
   align-items: center;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    padding: 3rem 1rem 2.5rem;
+  }
 `
 
 const Eyebrow = styled.p`
@@ -127,6 +137,9 @@ const StatRow = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 2rem 3rem;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Stat = styled.div`
@@ -176,6 +189,9 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Card = styled.div`
@@ -224,6 +240,9 @@ const TimelineItem = styled.div`
   border: 0.5px solid ${p => p.theme.colors.earth[200]};
   border-radius: 18px;
   padding: 1rem 1.1rem;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Time = styled.p`

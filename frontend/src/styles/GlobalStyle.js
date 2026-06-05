@@ -5,9 +5,10 @@ export const GlobalStyle = createGlobalStyle`
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html { font-size: 16px; scroll-behavior: smooth; }
+  html { font-size: 16px; scroll-behavior: smooth; overflow-x: hidden; }
 
   body {
+    min-height: 100vh;
     font-family: ${p => p.theme.fonts.body};
     background: ${p => p.theme.colors.earth[50]};
     color: ${p => p.theme.colors.earth[800]};

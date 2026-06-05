@@ -12,6 +12,11 @@ const Page = styled.div`
   flex-direction: column;
   gap: 1.25rem;
   max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding: 1.5rem 1rem;
+  }
 `
 
 const TopBar = styled.div`
@@ -36,11 +41,35 @@ const NotifBtn = styled.button`
   &:hover{background:${p => p.theme.colors.earth[100]};}
 `
 
-const MetricsGrid = styled.div`display:grid;grid-template-columns:repeat(4,1fr);gap:12px;`
+const MetricsGrid = styled.div`
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  @media (max-width: 1100px) {
+    grid-template-columns:repeat(2,1fr);
+  }
+  @media (max-width: 700px) {
+    grid-template-columns:1fr;
+  }
+`
 
-const MidGrid = styled.div`display:grid;grid-template-columns:1fr 300px;gap:1.25rem;`
+const MidGrid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:1.25rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
-const BottomGrid = styled.div`display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;`
+const BottomGrid = styled.div`
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.25rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 
 // Score ring
 const RingWrap = styled.div`display:flex;align-items:center;gap:1.25rem;margin-bottom:1.25rem;`

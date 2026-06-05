@@ -10,6 +10,9 @@ const Page = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   font-family: ${p => p.theme.fonts.body};
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const Left = styled.div`
@@ -20,6 +23,9 @@ const Left = styled.div`
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+  @media (max-width: 900px) {
+    padding: 2rem 1.5rem;
+  }
   &::before {
     content: '';
     position: absolute;
@@ -99,6 +105,9 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  @media (max-width: 900px) {
+    padding: 2rem 1.5rem;
+  }
 `
 
 const FormCard = styled.div`
@@ -109,6 +118,9 @@ const FormCard = styled.div`
   border-radius: 24px;
   padding: 2rem;
   box-shadow: ${p => p.theme.shadow.md};
+  @media (max-width: 900px) {
+    padding: 1.5rem;
+  }
 `
 
 const Kicker = styled.p`
@@ -142,7 +154,9 @@ const Row = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.85rem;
-`
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
 
 const Actions = styled.div`
   display: flex;

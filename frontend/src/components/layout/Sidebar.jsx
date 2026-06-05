@@ -4,7 +4,7 @@ import { currentTrader } from '../../data/mockData'
 import { Avatar } from '../ui'
 import {
   LayoutDashboard, CreditCard, Link2, BarChart2,
-  Building2, FileText, Shield, Settings, LogOut, TrendingUp
+  Building2, FileText, Shield, Settings, LogOut, TrendingUp, X
 } from 'lucide-react'
 
 const Wrap = styled.aside`
@@ -17,6 +17,41 @@ const Wrap = styled.aside`
   min-height: 100vh;
   position: sticky;
   top: 0;
+  transition: transform 0.25s ease;
+
+  @media (max-width: 900px) {
+    width: 260px;
+    min-width: auto;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(${p => p.open ? '0' : '-100%'});
+    z-index: 55;
+    box-shadow: 0 24px 60px rgba(15, 23, 34, 0.22);
+  }
+`
+
+const CloseRow = styled.div`
+  display: none;
+  @media (max-width: 900px) {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.75rem;
+  }
+`
+
+const CloseButton = styled.button`
+  width: 36px;
+  height: 36px;
+  border-radius: ${p => p.theme.radius.md};
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: ${p => p.theme.colors.earth[50]};
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 `
 
 const Logo = styled(NavLink)`
@@ -98,10 +133,13 @@ const LogOutBtn = styled.button`
   svg { width: 16px; height: 16px; }
 `
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose = () => {} }) {
   const navigate = useNavigate()
   return (
-    <Wrap>
+    <Wrap open={open}>
+      <CloseRow>
+        <CloseButton onClick={onClose} aria-label="Close navigation menu"><X size={16} /></CloseButton>
+      </CloseRow>
       <Logo to="/dashboard">Ago<span>ra</span></Logo>
 
       <NavItem to="/dashboard"><LayoutDashboard /> Dashboard</NavItem>

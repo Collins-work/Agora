@@ -14,6 +14,9 @@ const Page = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   font-family: ${p => p.theme.fonts.body};
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 `
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
@@ -25,6 +28,9 @@ const Left = styled.div`
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+  @media (max-width: 900px) {
+    padding: 2rem 1.5rem;
+  }
   &::before {
     content:'';
     position:absolute;
@@ -82,6 +88,9 @@ const Right = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  @media (max-width: 900px) {
+    padding: 2rem 1.5rem;
+  }
 `
 const StepIndicator = styled.div`
   display: flex;
@@ -109,7 +118,14 @@ const FormSub = styled.p`
 `
 const FormWrap = styled.div`animation: ${fadeUp} 0.35s ease both;`
 
-const Row = styled.div`display: grid; grid-template-columns: 1fr 1fr; gap: 12px;`
+const Row = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+`
 
 const OtpWrap = styled.div`display:flex;gap:10px;justify-content:center;margin:1rem 0;`
 const OtpInput = styled.input`

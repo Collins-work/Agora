@@ -5,7 +5,15 @@ import { Card, SectionTitle, Button, Badge } from '../components/ui'
 import { currentTrader } from '../data/mockData'
 import { Shield, CheckCircle, ArrowRight, AlertTriangle, Package, ChevronLeft } from 'lucide-react'
 
-const Page = styled.div`padding:1.75rem 2rem;max-width:1000px;`
+const Page = styled.div`
+  padding:1.75rem 2rem;
+  max-width:1000px;
+  margin: 0 auto;
+  width: 100%;
+  @media (max-width: 900px) {
+    padding:1.5rem 1rem;
+  }
+`
 const BackBtn = styled.button`
   display:flex;align-items:center;gap:4px;
   color:${p => p.theme.colors.earth[500]};
@@ -20,8 +28,20 @@ const HeroBanner = styled.div`
   padding:1.75rem 2rem;
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:1.5rem;color:${p => p.theme.colors.earth[50]};
+  @media (max-width: 900px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `
-const Grid = styled.div`display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;`
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;
+  margin-bottom:1.5rem;
+  @media (max-width: 900px) {
+    grid-template-columns:1fr;
+  }
+`
 const InsCard = styled(Card)`
   padding:0;overflow:hidden;
   border:${p => p.featured ? `2px solid ${p.theme.colors.gold[500]}` : `0.5px solid ${p.theme.colors.earth[200]}`};
@@ -89,6 +109,14 @@ export default function Insurance() {
             <p style={{ fontSize: '11px', color: theme.colors.earth[500], marginBottom: '4px' }}>Why you need it</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {['Market fires happen', 'Theft & flooding risk', 'Protect your investment'].map(r => (
+              const StepsGrid = styled.div`
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+                @media (max-width: 900px) {
+                  grid-template-columns: 1fr;
+                }
+              `
                 <div key={r} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: theme.colors.earth[200] }}>
                   <AlertTriangle size={12} color="#1976D2" /> {r}
                 </div>
@@ -131,7 +159,7 @@ export default function Insurance() {
 
         <Card delay="0.3s">
           <SectionTitle>How insurance works with Agora</SectionTitle>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1rem' }}>
+          <StepsGrid>
             {[
               { n: '1', title: 'Choose a plan', desc: 'Pick the cover that fits your stock value.' },
               { n: '2', title: 'Instant activation', desc: 'Your Agora ID activates the policy — no paperwork.' },
@@ -144,7 +172,7 @@ export default function Insurance() {
                 <p style={{ fontSize: '12px', color: theme.colors.earth[500], lineHeight: '1.5' }}>{s.desc}</p>
               </div>
             ))}
-          </div>
+          </StepsGrid>
         </Card>
       </Page>
     )
