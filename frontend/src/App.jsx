@@ -10,6 +10,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import IdCard from './pages/IdCard'
 import PaymentLink from './pages/PaymentLink'
+import VirtualAccount from './pages/VirtualAccount'
 import Transactions from './pages/Transactions'
 import Opportunities from './pages/Opportunities'
 import Loans from './pages/Loans'
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/id-card" element={<IdCard />} />
             <Route path="/payment-link" element={<PaymentLink />} />
+            <Route path="/virtual-account" element={<VirtualAccount />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/opportunities" element={<Opportunities />} />
             <Route path="/loans" element={<Loans />} />

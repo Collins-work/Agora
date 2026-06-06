@@ -363,6 +363,39 @@ app.post('/webhook/payment', (req, res) => {
   res.json({ received: true })
 })
 
+// ── Create virtual account (Virtual Account / Collection) ────────────────
+app.post('/api/virtual-account', async (req, res) => {
+  const { traderId, name, currency = 'NGN', bank_code } = req.body
+  const reference = `va_${traderId || Date.now()}`
+  const payload = {
+    account_name: name || 'Agora Trader',
+    currency,
+    reference,
+    metadata: { source: 'agora', traderId },
+  }
+  if (bank_code) payload.bank_code = bank_code
+
+  try {
+    // Attempt KoraPay virtual account creation
+    const resp = await korapay.post('/accounts/virtual', payload)
+    res.json({ success: true, data: resp.data })
+  } catch (err) {
+    console.warn('KoraPay virtual account call failed, returning mock:', err.message)
+    // Fallback mock virtual account for demo
+    res.json({
+      success: true,
+      mock: true,
+      data: {
+        account_name: payload.account_name,
+        account_number: '0123456789',
+        bank: bank_code || 'Mock Bank',
+        currency: payload.currency,
+        reference: payload.reference,
+      },
+    })
+  }
+})
+
 // ── OTP: send verification code (via KoraPay or any SMS provider) ──────────
 app.post('/api/send-otp', async (req, res) => {
   const { phone, email, method } = req.body
