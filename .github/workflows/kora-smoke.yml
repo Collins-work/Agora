@@ -1,0 +1,36 @@
+name: Kora Smoke Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  smoke:
+    if: ${{ secrets.KORAPAY_SECRET_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run Kora smoke tests
+        working-directory: backend
+        env:
+          KORAPAY_SECRET_KEY: ${{ secrets.KORAPAY_SECRET_KEY }}
+        run: npm run smoke:test
+
+  skip-warning:
+    if: ${{ !secrets.KORAPAY_SECRET_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: No Kora secret
+        run: echo "KORAPAY_SECRET_KEY not set — skipping Kora smoke tests"

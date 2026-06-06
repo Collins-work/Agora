@@ -3,6 +3,8 @@ const cors = require('cors')
 const axios = require('axios')
 const bcrypt = require('bcryptjs')
 require('dotenv').config()
+const crypto = require('crypto')
+const { korapay, safeRequest } = require('./koraClient')
 
 const nodemailer = require('nodemailer')
 const twilio = require('twilio')
@@ -14,19 +16,9 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'
 const USE_MOCK_OTP = process.env.MOCK_OTP === 'true'
 
 app.use(cors({ origin: FRONTEND_URL }))
-app.use(express.json())
+app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf } }))
 
-// ── KoraPay base config ────────────────────────────────────────────────────
-const KORAPAY_SECRET = process.env.KORAPAY_SECRET_KEY || 'sk_test_your_key_here'
-const KORAPAY_URL = 'https://api.korapay.com/merchant/api/v1'
-
-const korapay = axios.create({
-  baseURL: KORAPAY_URL,
-  headers: {
-    Authorization: `Bearer ${KORAPAY_SECRET}`,
-    'Content-Type': 'application/json',
-  },
-})
+const KORAPAY_SECRET = process.env.KORAPAY_SECRET_KEY || process.env.KORAPAY_SECRET || ''
 
 // ── OTP store (in-memory demo) ─────────────────────────────────────────────
 const otpStore = new Map()
@@ -199,8 +191,8 @@ app.post('/api/verify-bvn', async (req, res) => {
   }
   try {
     // KoraPay BVN verification endpoint
-    const response = await korapay.post('/identity/bvn', { bvn, firstName, lastName, dob })
-    res.json({ success: true, data: response.data })
+    const responseData = await safeRequest('post', '/identity/bvn', { bvn, firstName, lastName, dob })
+    res.json({ success: true, data: responseData })
   } catch (err) {
     // In demo mode, simulate a successful verification
     console.warn('KoraPay BVN call failed, using mock:', err.message)
@@ -235,7 +227,7 @@ app.post('/api/onboard', async (req, res) => {
     const pinHash = pin ? await bcrypt.hash(pin, SALT_ROUNDS) : null
 
     // Create a KoraPay payment link for the trader
-    const linkRes = await korapay.post('/transactions/initialize/link', {
+    const linkResp = await safeRequest('post', '/transactions/initialize/link', {
       amount: null, // open amount — customer enters
       currency: 'NGN',
       description: `Pay ${firstName} ${lastName} · Agora trader`,
@@ -244,7 +236,7 @@ app.post('/api/onboard', async (req, res) => {
       notification_url: `${process.env.WEBHOOK_URL || 'https://webhook.site/agora'}/webhook/payment`,
     })
 
-    const paymentLink = linkRes.data?.data?.link || `https://pay.korapay.com/agora/${slug}`
+    const paymentLink = linkResp?.data?.link || `https://pay.korapay.com/agora/${slug}`
 
     const insertRes = await query(
       `INSERT INTO traders (user_id, business_id, first_name, last_name, phone, email, bvn_hash, bvn_masked, pin_hash, market, trade_type, payment_link, credit_score)
@@ -298,14 +290,14 @@ app.post('/api/onboard', async (req, res) => {
 app.post('/api/payment-link', async (req, res) => {
   const { traderId, traderName, amount, description } = req.body
   try {
-    const linkRes = await korapay.post('/transactions/initialize/link', {
+    const linkResp = await safeRequest('post', '/transactions/initialize/link', {
       amount: amount || null,
       currency: 'NGN',
       description: description || `Pay ${traderName} via Agora`,
       reference: `ag_${traderId}_${Date.now()}`,
       merchant_bears_cost: false,
     })
-    res.json({ success: true, link: linkRes.data?.data?.link })
+    res.json({ success: true, link: linkResp?.data?.link })
   } catch (err) {
     console.warn('KoraPay link failed, using mock:', err.message)
     const slug = traderName.toLowerCase().replace(/\s+/g, '-')
@@ -352,8 +344,38 @@ app.get('/api/credit-score/:traderId', (req, res) => {
 })
 
 // ── KoraPay webhook receiver ───────────────────────────────────────────────
+// Use captured raw body from express.json verify option for signature verification
 app.post('/webhook/payment', (req, res) => {
-  const event = req.body
+  const sigSecret = process.env.KORAPAY_WEBHOOK_SECRET || process.env.KORAPAY_WEBHOOK_KEY || ''
+  const raw = req.rawBody || Buffer.from(JSON.stringify(req.body || {}))
+  let event = null
+
+  if (sigSecret) {
+    const header = req.headers['x-korapay-signature'] || req.headers['x-signature'] || ''
+    const hmac = crypto.createHmac('sha256', sigSecret).update(raw).digest('hex')
+    try {
+      const headerBuf = Buffer.from(String(header), 'utf8')
+      const hmacBuf = Buffer.from(String(hmac), 'utf8')
+      if (headerBuf.length !== hmacBuf.length || !crypto.timingSafeEqual(headerBuf, hmacBuf)) {
+        console.warn('⚠️ Webhook signature mismatch')
+        return res.status(401).json({ success: false, message: 'Invalid webhook signature' })
+      }
+    } catch (e) {
+      console.warn('Webhook signature verification failed', e.message)
+      return res.status(401).json({ success: false, message: 'Invalid webhook signature' })
+    }
+
+    try {
+      event = JSON.parse(raw.toString())
+    } catch (e) {
+      console.warn('Invalid JSON payload', e.message)
+      return res.status(400).json({ success: false, message: 'Invalid JSON payload' })
+    }
+  } else {
+    event = req.body
+    console.warn('ℹ️ Webhook received without signature verification (KORAPAY_WEBHOOK_SECRET not set)')
+  }
+
   console.log('KoraPay webhook received:', JSON.stringify(event, null, 2))
   // In production: update trader transaction history, recalculate credit score
   if (event?.event === 'charge.success') {
@@ -377,8 +399,8 @@ app.post('/api/virtual-account', async (req, res) => {
 
   try {
     // Attempt KoraPay virtual account creation
-    const resp = await korapay.post('/accounts/virtual', payload)
-    res.json({ success: true, data: resp.data })
+    const respData = await safeRequest('post', '/accounts/virtual', payload)
+    res.json({ success: true, data: respData })
   } catch (err) {
     console.warn('KoraPay virtual account call failed, returning mock:', err.message)
     // Fallback mock virtual account for demo
