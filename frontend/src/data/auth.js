@@ -66,7 +66,7 @@ export const getActiveCollections = () => {
 
 export const saveAccount = account => {
     const accounts = getAccounts()
-    const nextAccount = { ...account }
+    const nextAccount = { ...account, isDemo: account.isDemo ?? false }
     const index = accounts.findIndex(item => item.id === nextAccount.id)
     const nextAccounts = index >= 0
         ? accounts.map(item => (item.id === nextAccount.id ? nextAccount : item))
@@ -101,7 +101,10 @@ export const findAccountByIdentifier = (identifier, pin) => {
 export const createAccountFromOnboarding = (form, serverData = {}) => {
     const firstName = form.firstName.trim()
     const lastName = form.lastName.trim()
-    const businessId = serverData.businessId || `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
+    let businessId = serverData.businessId || `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
+    while (businessId === demoAccount.id) {
+        businessId = `AG-LG-${Math.floor(10000 + Math.random() * 90000)}`
+    }
     const name = `${firstName} ${lastName}`.trim()
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
     const maskedBvn = form.bvn ? form.bvn.replace(/\d(?=\d{4})/g, '•') : 'Pending verification'
@@ -115,7 +118,7 @@ export const createAccountFromOnboarding = (form, serverData = {}) => {
         bvn: serverData.bvn ? String(serverData.bvn).replace(/\d(?=\d{4})/g, '•') : maskedBvn,
         phone: form.phone,
         email: form.email,
-        pin: form.pin,
+        pin: form.pin?.trim() || '1234',
         memberSince: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
         creditScore: serverData.creditScore ?? 0,
         maxScore: serverData.maxScore ?? 850,
